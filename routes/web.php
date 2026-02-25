@@ -24,3 +24,7 @@ Route::get('/scan-camera', function () {
 });
 
 Route::post('/scan', [ScanController::class, 'process'])->name('scan.process');
+
+Route::get('/test-db', function () {
+    return DB::connection()->getDatabaseName();
+});
