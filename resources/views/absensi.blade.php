@@ -64,6 +64,10 @@
 		const qrContainer = document.getElementById('qrcode');
 		let currentToken = '';
 
+		const urlGet      = @json(route('token.get'));
+		const urlGenerate = @json(route('token.generate'));
+		const urlStatus   = @json(route('token.status'));
+
 		function displayQRCode(token) {
 			if (!token) return;
 			currentToken = token;
@@ -102,22 +106,22 @@
 		}
 
 		async function generateNewQRCode() {
-			const token = await fetchAPI('php/generate_token.php');
-			displayQRCode(token);
+			const token = await fetchAPI(urlGenerate);
+			if (token) displayQRCode(token);
 		}
 
 		async function initializeQRCode() {
-			const token = await fetchAPI('php/get_token.php');
-			if (token) {
-				displayQRCode(token);
+			const token = await fetchAPI(urlGet);
+			if (token && token.trim() !== '') {
+				displayQRCode(token.trim());
 			} else {
 				await generateNewQRCode();
 			}
 		}
 
 		setInterval(async () => {
-			const status = await fetchAPI('php/token_status.php');
-			if (status && status !== 'active') {
+			const status = await fetchAPI(urlStatus);
+			if (status && status.trim() !== 'active') {
 				await generateNewQRCode();
 			}
 		}, 3000);
