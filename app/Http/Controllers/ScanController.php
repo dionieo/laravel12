@@ -72,7 +72,7 @@ class ScanController extends Controller
         $timeDatangStart = Carbon::createFromFormat('Y-m-d H:i', $currentDate.' 06:00', 'Asia/Jakarta');
         $timeDatangEnd = Carbon::createFromFormat('Y-m-d H:i', $currentDate.' 08:45', 'Asia/Jakarta');
         $timeDatangTelat = Carbon::createFromFormat('Y-m-d H:i', $currentDate.' 08:15', 'Asia/Jakarta');
-        $timePulangStart = Carbon::createFromFormat('Y-m-d H:i', $currentDate.' 16:00', 'Asia/Jakarta');
+        $timePulangStart = Carbon::createFromFormat('Y-m-d H:i', $currentDate.' 14:00', 'Asia/Jakarta');
         $timePulangEnd = Carbon::createFromFormat('Y-m-d H:i', $currentDate.' 23:59', 'Asia/Jakarta');
 
         $statusAbsensi = '';
