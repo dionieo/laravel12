@@ -112,20 +112,10 @@ class ScanController extends Controller
             ], 500);
         }
 
-        $hasUsernameColumn = Schema::hasColumn('users', 'username');
-        $hasEmailColumn = Schema::hasColumn('users', 'email');
-
-        $userQuery = DB::table('users')->select('id')->where('name', $username);
-
-        if ($hasUsernameColumn) {
-            $userQuery->orWhere('username', $username);
-        }
-
-        if ($hasEmailColumn) {
-            $userQuery->orWhere('email', $username);
-        }
-
-        $user = $userQuery->first();
+        $user = DB::table('users')
+            ->select('id')
+            ->where('username', $username)
+            ->first();
         if (! $user) {
             return response()->json([
                 'status' => 'error',
@@ -166,7 +156,7 @@ class ScanController extends Controller
 
         $hasNamaLengkapColumn = Schema::hasColumn('users', 'nama_lengkap');
 
-        $notifColumns = ['telegram_chat_id', 'name'];
+        $notifColumns = ['telegram_chat_id', 'username'];
         if ($hasNamaLengkapColumn) {
             $notifColumns[] = 'nama_lengkap';
         }
@@ -181,7 +171,7 @@ class ScanController extends Controller
         if ($notifUser && ! empty($notifUser->telegram_chat_id) && $botToken !== '') {
             $namaPanggilan = $hasNamaLengkapColumn && ! empty($notifUser->nama_lengkap)
                 ? $notifUser->nama_lengkap
-                : ($notifUser->name ?? 'Siswa');
+                : ($notifUser->username ?? 'Siswa');
 
             $pesanNotifikasi = "🔔 Notifikasi Absensi\n\n";
             $pesanNotifikasi .= 'Ananda: *'.$namaPanggilan."*\n";

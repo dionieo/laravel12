@@ -40,7 +40,7 @@
 	</main>
 
 	<script>
-		const scanUrl = @json(route('scan.process'));
+		const scanUrl = '/scan';
 		const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 		let html5QrCode;
