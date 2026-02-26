@@ -17,7 +17,7 @@ class LoginController extends Controller
             return $this->redirectByLevel(Auth::user()->level);
         }
 
-        return view('login');
+        return view('welcome');
     }
 
     /**

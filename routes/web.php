@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-    Route::get('/',      [LoginController::class, 'showForm'])->name('login');
-    Route::get('/login', [LoginController::class, 'showForm']);
+    Route::get('/',      [LoginController::class, 'showForm']);
+    Route::get('/login', [LoginController::class, 'showForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 });
 
