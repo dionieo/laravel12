@@ -13,6 +13,11 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Nonaktifkan remember_token karena kolom tidak ada di tabel users.
+     */
+    protected $rememberTokenName = null;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

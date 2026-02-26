@@ -11,8 +11,13 @@
                 </h1>
             </div>
         </div>
-        <button onclick="window.location.href='logout.php'" class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 transition hover:scale-105 hover:bg-red-600 hover:text-white">
-            <i data-lucide="log-out" width="20" height="20"></i>
-        </button>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit"
+                    title="Logout"
+                    class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 transition hover:scale-105 hover:bg-red-600 hover:text-white">
+                <i data-lucide="log-out" width="20" height="20"></i>
+            </button>
+        </form>
     </div>
 </header>
