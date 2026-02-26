@@ -8,7 +8,7 @@
             <p class="text-sm font-normal text-slate-500">Generate QR Code</p>
         </a>
 
-        <a href="laporan_harian.php" class="block rounded-[20px] bg-white px-6 py-8 text-center text-inherit shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+        <a href="laporan-harian" class="block rounded-[20px] bg-white px-6 py-8 text-center text-inherit shadow-md transition hover:-translate-y-1 hover:shadow-xl">
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-100 to-emerald-200 text-emerald-600">
                 <i data-lucide="calendar-check" width="32" height="32"></i>
             </div>

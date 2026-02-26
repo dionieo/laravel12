@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TokenController;
@@ -57,6 +58,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/token/get',      [TokenController::class, 'get'])->name('token.get');
     Route::get('/token/generate', [TokenController::class, 'generate'])->name('token.generate');
     Route::get('/token/status',   [TokenController::class, 'status'])->name('token.status');
+
+    // Laporan harian (admin)
+    Route::get('/laporan-harian', [LaporanController::class, 'harian'])->name('laporan.harian');
 });
 
 // Debug DB (opsional, bisa dihapus di production)
