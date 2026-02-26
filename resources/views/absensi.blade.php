@@ -64,9 +64,9 @@
 		const qrContainer = document.getElementById('qrcode');
 		let currentToken = '';
 
-		const urlGet      = @json(route('token.get'));
-		const urlGenerate = @json(route('token.generate'));
-		const urlStatus   = @json(route('token.status'));
+		const urlGet      = '/token/get';
+		const urlGenerate = '/token/generate';
+		const urlStatus   = '/token/status';
 
 		function displayQRCode(token) {
 			if (!token) return;
