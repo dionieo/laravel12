@@ -20,6 +20,8 @@
 
 	$sessionMessage = 'Saat ini di luar jam absensi.';
 
+	dd($currentTime);
+
 	if ($currentTime >= $timeDatangStart && $currentTime <= $timeDatangEnd) {
 		$sessionMessage = "Sesi Absensi: <strong>Datang ($timeDatangStart - $timeDatangEnd)</strong>";
 	} elseif ($currentTime >= $timePulangStart && $currentTime <= $timePulangEnd) {
