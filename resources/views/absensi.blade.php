@@ -95,9 +95,19 @@
 
 		async function fetchAPI(url) {
 			try {
-				const response = await fetch(url);
-				if (!response.ok) throw new Error('Network response was not ok');
-				return await response.text();
+				const response = await fetch(url, {
+					headers: {
+						'Accept': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					credentials: 'same-origin',
+				});
+
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}`);
+				}
+
+				return await response.json();
 			} catch (error) {
 				console.error('Fetch error:', error);
 				qrContainer.innerHTML = '<div class="px-5 py-10 text-center text-sm text-red-600">Gagal memuat QR Code.<br>Cek koneksi internet Anda.</div>';
@@ -106,22 +116,24 @@
 		}
 
 		async function generateNewQRCode() {
-			const token = await fetchAPI(urlGenerate);
-			if (token) displayQRCode(token);
+			const data = await fetchAPI(urlGenerate);
+			if (data && data.success && data.token) {
+				displayQRCode(data.token);
+			}
 		}
 
 		async function initializeQRCode() {
-			const token = await fetchAPI(urlGet);
-			if (token && token.trim() !== '') {
-				displayQRCode(token.trim());
+			const data = await fetchAPI(urlGet);
+			if (data && data.success && data.token && data.token.trim() !== '') {
+				displayQRCode(data.token.trim());
 			} else {
 				await generateNewQRCode();
 			}
 		}
 
 		setInterval(async () => {
-			const status = await fetchAPI(urlStatus);
-			if (status && status.trim() !== 'active') {
+			const data = await fetchAPI(urlStatus);
+			if (data && data.status !== 'active') {
 				await generateNewQRCode();
 			}
 		}, 3000);
