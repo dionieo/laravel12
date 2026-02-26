@@ -13,29 +13,56 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
+	<style>
+		/* Tame html5-qrcode internal elements on mobile */
+		#reader {
+			border: none !important;
+		}
+		#reader video {
+			width: 100% !important;
+			height: auto !important;
+			border-radius: 0.75rem;
+			object-fit: cover;
+		}
+		#reader__scan_region {
+			min-height: 0 !important;
+		}
+		#reader__scan_region img {
+			display: none !important;
+		}
+		#reader__dashboard_section {
+			display: none !important;
+		}
+		#reader__header_message {
+			display: none !important;
+		}
+		#qr-shaded-region {
+			border-width: 2px !important;
+		}
+	</style>
 </head>
 @php
 	$username = $username ?? (auth()->user()->username ?? auth()->user()->name ?? '');
 @endphp
-<body class="min-h-screen bg-linear-to-br from-indigo-100 to-slate-100 px-2 py-8" style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-	<main class="relative mx-auto mt-8 w-full max-w-125 rounded-[18px] bg-white px-8 pb-8 pt-10 text-center shadow-[0_8px_32px_rgba(31,38,135,0.12)] max-[700px]:mt-4 max-[700px]:max-w-[99vw] max-[700px]:px-2 max-[700px]:py-5">
-		<div class="mb-2 text-[2.5rem] text-blue-600">
+<body class="min-h-screen bg-linear-to-br from-indigo-100 to-slate-100 px-3 py-4 sm:px-4 sm:py-8" style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+	<main class="relative mx-auto w-full max-w-md rounded-2xl bg-white px-4 pb-6 pt-6 text-center shadow-lg sm:mt-4 sm:px-8 sm:pb-8 sm:pt-10">
+		<div class="mb-1.5 text-3xl text-blue-600 sm:mb-2 sm:text-4xl">
 			<i class="fa-solid fa-camera"></i>
 		</div>
-		<h2 class="mb-2 text-[2rem] tracking-[1px] text-blue-900">Scan QR Code</h2>
-		<div class="mb-5 text-[0.95rem] text-slate-500">
-			Pilih kamera yang tersedia, lalu arahkan ke QR Code absensi.
+		<h2 class="mb-1.5 text-xl font-bold tracking-wide text-blue-900 sm:mb-2 sm:text-2xl">Scan QR Code</h2>
+		<p class="mb-4 text-xs text-slate-500 sm:mb-5 sm:text-sm">
+			Arahkan kamera ke QR Code absensi.
+		</p>
+
+		<div id="reader" class="mx-auto mb-3 w-full overflow-hidden rounded-xl bg-slate-50 shadow-sm sm:mb-4"></div>
+
+		<div class="mb-4 flex items-center justify-center gap-2 sm:mb-5">
+			<label for="camera-select" class="text-xs font-medium text-slate-600 sm:text-sm">Kamera:</label>
+			<select id="camera-select" class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none sm:text-sm"></select>
 		</div>
 
-		<div id="reader" class="mx-auto mb-2 mt-6 flex aspect-square w-100 max-w-[98vw] min-w-55 items-center justify-center rounded-xl bg-slate-50 p-4 shadow-[0_2px_8px_rgba(31,38,135,0.07)] max-[700px]:w-[95vw] max-[700px]:max-w-[99vw] max-[700px]:min-w-40 max-[350px]:h-[98vw] max-[350px]:w-[98vw] max-[350px]:min-h-25 max-[350px]:min-w-25"></div>
-
-		<div class="mb-5">
-			<label for="camera-select" class="mr-2 text-sm text-slate-700">Pilih Kamera:</label>
-			<select id="camera-select" class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"></select>
-		</div>
-
-		<a href="{{ url('/dashboard') }}" class="mt-6 inline-block rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
-			<i class="fa fa-arrow-left"></i> Kembali ke Dashboard
+		<a href="{{ url('/dashboard') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800 sm:text-sm">
+			<i class="fa fa-arrow-left text-xs"></i> Kembali ke Dashboard
 		</a>
 	</main>
 
@@ -49,14 +76,10 @@
 		let userLongitude = null;
 
 		function getResponsiveQrbox() {
-			const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-			let containerSize = 400;
-			if (vw < 700) containerSize = Math.floor(vw * 0.95);
-			if (vw < 400) containerSize = Math.floor(vw * 0.98);
-			if (containerSize < 160) containerSize = 160;
-
-			const qrboxSize = Math.floor(containerSize * 0.8);
-			return { width: qrboxSize, height: qrboxSize };
+			const readerEl = document.getElementById('reader');
+			const containerWidth = readerEl ? readerEl.offsetWidth : 300;
+			const qrboxSize = Math.floor(containerWidth * 0.7);
+			return { width: Math.max(qrboxSize, 150), height: Math.max(qrboxSize, 150) };
 		}
 
 		function getGPSLocation(callback) {

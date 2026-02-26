@@ -87,31 +87,25 @@ class ScanController extends Controller
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Absensi hanya bisa dilakukan pada jam 06:00-08:45 (datang) atau 16:00-23:59 (pulang).',
+                'message' => 'Absensi hanya bisa dilakukan pada jam 06:00-08:45 (datang) atau 14:00-23:59 (pulang).',
             ], 403);
         }
 
-        $consumeCount = DB::table('tokens')
+        // ── Validasi token (cek saja, BELUM di-used) ──
+        $tokenRow = DB::table('tokens')
             ->where('token', $token)
             ->where('status', 'active')
             ->where('expired_at', '>=', now())
-            ->update(['status' => 'used']);
+            ->first(['id']);
 
-        if ($consumeCount === 0) {
+        if (! $tokenRow) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token tidak valid, sudah digunakan, atau kadaluarsa.',
             ], 400);
         }
 
-        $tokenRow = DB::table('tokens')->select('id')->where('token', $token)->first();
-        if (! $tokenRow) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal mengambil informasi token setelah konsumsi.',
-            ], 500);
-        }
-
+        // ── Validasi user ──
         $user = DB::table('users')
             ->select('id')
             ->where('username', $username)
@@ -125,23 +119,39 @@ class ScanController extends Controller
 
         $userId = (int) $user->id;
 
+        // ── Cek apakah sudah absensi tipe ini hari ini ──
         $checkQuery = DB::table('absensi')
             ->where('user_id', $userId)
             ->where('tanggal', $currentDate);
 
         if ($tipeAbsensi === 'datang') {
-            $checkQuery->whereIn('status', ['hadir', 'terlambat']);
+            $sudahDatang = (clone $checkQuery)->whereIn('status', ['hadir', 'terlambat'])->exists();
+            if ($sudahDatang) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda sudah melakukan absensi datang hari ini.',
+                ], 409);
+            }
         } else {
-            $checkQuery->where('status', 'pulang');
+            // Pulang: wajib sudah absensi datang dulu
+            $sudahDatang = (clone $checkQuery)->whereIn('status', ['hadir', 'terlambat'])->exists();
+            if (! $sudahDatang) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda belum melakukan absensi datang hari ini. Silakan absensi datang terlebih dahulu.',
+                ], 403);
+            }
+
+            $sudahPulang = (clone $checkQuery)->where('status', 'pulang')->exists();
+            if ($sudahPulang) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda sudah melakukan absensi pulang hari ini.',
+                ], 409);
+            }
         }
 
-        if ($checkQuery->exists()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "Anda sudah melakukan absensi {$tipeAbsensi} hari ini.",
-            ], 409);
-        }
-
+        // ── Semua validasi lolos → consume token & insert absensi ──
         $waktu = $now->format('H:i:s');
 
         DB::table('absensi')->insert([
@@ -152,6 +162,7 @@ class ScanController extends Controller
             'status' => $statusAbsensi,
         ]);
 
+        // Token di-used hanya setelah absensi berhasil disimpan
         DB::table('tokens')->where('id', (int) $tokenRow->id)->update(['status' => 'used']);
 
         $hasNamaLengkapColumn = Schema::hasColumn('users', 'nama_lengkap');
