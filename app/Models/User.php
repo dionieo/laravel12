@@ -48,7 +48,8 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'password' => 'hashed',
+            // Tidak auto-hash — password lama bisa MD5/plain,
+            // re-hash dilakukan di LoginController saat login pertama.
         ];
     }
 
