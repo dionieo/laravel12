@@ -15,12 +15,10 @@
 	$currentTime = now('Asia/Jakarta')->format('H:i');
 	$timeDatangStart = '07:00';
 	$timeDatangEnd = '09:00';
-	$timePulangStart = '16:00';
+	$timePulangStart = '14:00';
 	$timePulangEnd = '23:59';
 
 	$sessionMessage = 'Saat ini di luar jam absensi.';
-
-	dd($currentTime);
 
 	if ($currentTime >= $timeDatangStart && $currentTime <= $timeDatangEnd) {
 		$sessionMessage = "Sesi Absensi: <strong>Datang ($timeDatangStart - $timeDatangEnd)</strong>";
