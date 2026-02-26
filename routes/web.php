@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KelolaIzinController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ScanController;
@@ -61,6 +62,10 @@ Route::middleware('auth')->group(function () {
 
     // Laporan harian (admin)
     Route::get('/laporan-harian', [LaporanController::class, 'harian'])->name('laporan.harian');
+
+    // Kelola izin (admin)
+    Route::get('/kelola-izin', [KelolaIzinController::class, 'index'])->name('kelola-izin');
+    Route::post('/kelola-izin', [KelolaIzinController::class, 'action'])->name('kelola-izin.action');
 });
 
 // Debug DB (opsional, bisa dihapus di production)
