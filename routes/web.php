@@ -5,6 +5,7 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TokenController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,7 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', function () {
-        $user = auth()->user();
+        $user = Auth::user();
         return view('dashboard', [
             'namaLengkap'  => $user->nama_lengkap ?? $user->name ?? 'Pengguna',
             'level'        => $user->level ?? 'siswa',
