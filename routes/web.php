@@ -34,12 +34,53 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', function () {
         $user = Auth::user();
-        return view('dashboard', [
+        $today = now()->timezone('Asia/Jakarta')->toDateString();
+
+        $data = [
             'namaLengkap'  => $user->nama_lengkap ?? $user->name ?? 'Pengguna',
             'level'        => $user->level ?? 'siswa',
             'totalAbsensi' => 0,
             'sudahAbsen'   => false,
-        ]);
+        ];
+
+        if ($user->level === 'admin') {
+            // Total absensi datang hari ini (hadir + terlambat)
+            $data['totalAbsensi'] = DB::table('absensi')
+                ->where('tanggal', $today)
+                ->whereIn('status', ['hadir', 'terlambat'])
+                ->count();
+
+            // Izin pending counts
+            $pending = DB::table('izin_siswa')
+                ->join('users', 'izin_siswa.user_id', '=', 'users.id')
+                ->where('izin_siswa.status', 'pending')
+                ->where('users.status', 'aktif')
+                ->selectRaw("
+                    COUNT(*) as total,
+                    SUM(CASE WHEN izin_siswa.tanggal < CURDATE() THEN 1 ELSE 0 END) as overdue,
+                    SUM(CASE WHEN izin_siswa.tanggal = CURDATE() THEN 1 ELSE 0 END) as today
+                ")
+                ->first();
+
+            $data['totalPending'] = $pending->total ?? 0;
+            $data['overdueCount'] = $pending->overdue ?? 0;
+            $data['todayCount']   = $pending->today ?? 0;
+        } else {
+            // Siswa: cek sudah absen hari ini
+            $absensi = DB::table('absensi')
+                ->where('user_id', $user->id)
+                ->where('tanggal', $today)
+                ->whereIn('status', ['hadir', 'terlambat'])
+                ->first();
+
+            if ($absensi) {
+                $data['sudahAbsen']  = true;
+                $data['statusAbsen'] = $absensi->status;
+                $data['waktuAbsen']  = $absensi->waktu;
+            }
+        }
+
+        return view('dashboard', $data);
     })->name('dashboard');
 
     // QR Absensi (admin)

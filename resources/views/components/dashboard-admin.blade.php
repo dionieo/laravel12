@@ -17,7 +17,7 @@
             <p class="text-sm font-normal text-slate-500">Total Absensi</p>
         </a>
 
-        <a href="kelola_izin.php" class="block rounded-[20px] bg-white px-6 py-8 text-center text-inherit shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+        <a href="kelola-izin" class="block rounded-[20px] bg-white px-6 py-8 text-center text-inherit shadow-md transition hover:-translate-y-1 hover:shadow-xl">
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-amber-100 to-amber-200 text-amber-600">
                 <i data-lucide="clipboard-list" width="32" height="32"></i>
             </div>
